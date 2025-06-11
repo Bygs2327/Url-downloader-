@@ -69,7 +69,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url('https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/82fe17e9-749f-4352-85ed-9fa9439c50b1.png');
+    background-image: url('https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/27b15bff-dc1a-4aaa-8493-8c5fc9479662.png');
     background-size: cover;
     background-attachment: fixed;
     background-position: center;
@@ -78,7 +78,7 @@
     pointer-events: none;
   }
   body.dark .parallax-bg {
-    background-image: url('https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/399e30ca-7b0c-438c-ac65-5903e4b136ff.png');
+    background-image: url('https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/fca2ba24-256a-44d1-98fc-4d2932207e8d.png');
   }
   /* Container */
   .container {
@@ -281,7 +281,8 @@
     font-weight: 600;
     color: var(--success-color);
     min-width: 140px;
-    margin-top: 12px; /* move down */
+    margin-top: 20px; /* moved down */
+    text-align: center; /* center text */
   }
   .result-status label {
     display: flex;
@@ -329,7 +330,8 @@
     .result-status {
       flex-direction: row;
       justify-content: flex-start;
-      margin-top: 8px;
+      margin-top: 16px;
+      text-align: left;
     }
     .result-item {
       grid-template-columns: 30px 1fr auto;
@@ -429,8 +431,8 @@
       <div class="results-section" id="results" aria-live="polite" aria-atomic="true" aria-relevant="additions"></div>
     </section>
 
-    <section aria-labelledby="search-header">
-      <h2 id="search-header" style="font-size:1.25rem; margin: "16px 0 8px 0;">Cari Data Pengantaran</h2>
+    <section aria-labelledby="search-header-search">
+      <h2 id="search-header-search" style="font-size:1.25rem; margin: 16px 0 8px 0;">Cari Data Pengantaran</h2>
       <form id="search-form" aria-describedby="search-desc" novalidate class="search-form">
         <input type="text" id="search-driver" placeholder="Cari berdasarkan Nama Supir" aria-label="Cari berdasarkan Nama Supir" autocomplete="off" />
         <input type="date" id="search-date" aria-label="Cari berdasarkan Tanggal Pengantaran" />
@@ -802,123 +804,6 @@
       renderEntries(filtered);
     }
 
-    // Search form handler (searches all data)
-    searchForm.addEventListener('submit', e => {
-      e.preventDefault();
-      const allData = loadDeliveryData();
-
-      const driverSearch = searchDriverInput.value.trim().toLowerCase();
-      const dateSearch = searchDateInput.value;
-      const routeSearch = searchRouteInput.value.trim().toLowerCase();
-
-      const filtered = allData.filter(entry => {
-        let driverMatch = true,
-            dateMatch = true,
-            routeMatch = true;
-        if (driverSearch) {
-          driverMatch = entry.driver.toLowerCase().includes(driverSearch);
-        }
-        if (dateSearch) {
-          const entryDateISO = new Date(entry.year, entry.month-1, entry.date).toISOString().slice(0,10);
-          dateMatch = entryDateISO === dateSearch;
-        }
-        if (routeSearch) {
-          routeMatch = entry.route.toLowerCase().includes(routeSearch);
-        }
-        return driverMatch && dateMatch && routeMatch;
-      });
-      // Clear selection on new search to avoid confusion
-      selectedForSum.clear();
-      updateTotalCashSum();
-      renderEntries(filtered);
-    });
-
-    // Dark mode toggle function
-    function applyDarkMode(enabled) {
-      if (enabled) {
-        document.body.classList.add('dark');
-        darkModeIcon.textContent = 'light_mode';
-      } else {
-        document.body.classList.remove('dark');
-        darkModeIcon.textContent = 'dark_mode';
-      }
-    }
-    darkModeToggle.addEventListener('click', () => {
-      const isDark = document.body.classList.contains('dark');
-      const newMode = !isDark;
-      applyDarkMode(newMode);
-      localStorage.setItem(DARK_MODE_KEY, newMode ? '1' : '0');
-    });
-
-    // Load dark mode preference on page load
-    function loadDarkModePreference() {
-      const val = localStorage.getItem(DARK_MODE_KEY);
-      const isDark = val === '1';
-      applyDarkMode(isDark);
-    }
-
-    // Initial setup: load demo data and render today's entries
-    function loadDemoData() {
-      const map = loadDriverPlateMap();
-      if (Object.keys(map).length === 0) {
-        const demoMap = {
-          'Agus': 'B 1234 XYZ',
-          'Budi': 'D 5678 ABC',
-          'Citra': 'F 9012 DEF'
-        };
-        saveDriverPlateMap(demoMap);
-      }
-      const data = loadDeliveryData();
-      if (data.length === 0) {
-        const demoEntries = [
-          {
-            id: 'demo1',
-            day: 'Senin',
-            date: 14,
-            month: 8,
-            year: 2023,
-            driver: 'Agus',
-            plate: 'B 1234 XYZ',
-            route: 'Jakarta - Bandung',
-            division: ['Elektronik'],
-            divisionCount: 1,
-            cashDeposit: 2000000,
-            adminChecked: true
-          },
-          {
-            id: 'demo2',
-            day: 'Selasa',
-            date: 15,
-            month: 8,
-            year: 2023,
-            driver: 'Budi',
-            plate: 'D 5678 ABC',
-            route: 'Bandung - Surabaya',
-            division: ['Makanan', 'Minuman'],
-            divisionCount: 2,
-            cashDeposit: 3500000,
-            adminChecked: false
-          },
-          {
-            id: 'demo3',
-            day: 'Rabu',
-            date: 16,
-            month: 8,
-            year: 2023,
-            driver: 'Citra',
-            plate: 'F 9012 DEF',
-            route: 'Surabaya - Malang',
-            division: ['Pakaian', 'Aksesoris', 'Sepatu'],
-            divisionCount: 3,
-            cashDeposit: 1500000,
-            adminChecked: true
-          }
-        ];
-        saveDeliveryData(demoEntries);
-      }
-      renderCurrentDayEntries();
-    }
-
     loadDarkModePreference();
     loadDemoData();
 
@@ -927,3 +812,5 @@
 </body>
 </html>
 
+
+        
