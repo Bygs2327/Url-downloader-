@@ -21,6 +21,8 @@
     --success-icon: #059669;
     --shadow-color: rgba(0,0,0,0.05);
     --btn-shadow: rgba(79, 70, 229, 0.25);
+    --today-bg: #e0e7ff;
+    --today-border: #6366f1;
   }
   body.dark {
     --bg-color: #121214;
@@ -35,6 +37,8 @@
     --success-icon: #10b981;
     --shadow-color: rgba(255,255,255,0.1);
     --btn-shadow: rgba(129,140,248,0.4);
+    --today-bg: #3b82f680;
+    --today-border: #818cf8;
   }
 
   /* Reset and base */
@@ -69,7 +73,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url('https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/27b15bff-dc1a-4aaa-8493-8c5fc9479662.png');
+    background-image: url('https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c569fbee-67fa-459e-bdf6-afae8c615e25.png');
     background-size: cover;
     background-attachment: fixed;
     background-position: center;
@@ -78,7 +82,7 @@
     pointer-events: none;
   }
   body.dark .parallax-bg {
-    background-image: url('https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/fca2ba24-256a-44d1-98fc-4d2932207e8d.png');
+    background-image: url('https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/43172f78-e5e6-48b4-9e1c-129c9fc2552b.png');
   }
   /* Container */
   .container {
@@ -256,7 +260,7 @@
     align-items: center;
     gap: 8px;
   }
-  /* Place selection checkbox inside the strong (left of name) */
+  /* Selection checkbox inside strong (left of name) */
   .result-item strong .select-checkbox {
     display: flex;
     align-items: center;
@@ -269,32 +273,32 @@
     height: 20px;
     cursor: pointer;
   }
-  /* Smaller info lines with no big breaks, keep inline */
+  /* Smaller info lines compact */
   .result-left > div {
     margin: 0;
   }
+  /* Status moved to below, in row layout */
   .result-status {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
+    grid-column: 2 / 4;
+    margin-top: 12px;
     font-weight: 600;
     color: var(--success-color);
-    min-width: 140px;
-    margin-top: 20px; /* moved down */
-    text-align: center; /* center text */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-start;
   }
   .result-status label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
   .result-status .material-icons {
-    font-size: 28px;
+    font-size: 24px;
     color: var(--success-icon);
   }
-  /* Cash deposit input style in results */
+  /* Cash deposit input */
   .cash-deposit-input {
     width: 130px;
     padding: 6px 8px;
@@ -328,10 +332,9 @@
       width: 100%;
     }
     .result-status {
-      flex-direction: row;
+      grid-column: 1 / -1;
+      margin-top: 8px;
       justify-content: flex-start;
-      margin-top: 16px;
-      text-align: left;
     }
     .result-item {
       grid-template-columns: 30px 1fr auto;
@@ -661,7 +664,12 @@
       if (index >= 0) {
         data[index].adminChecked = checked;
         saveDeliveryData(data);
-        renderCurrentDayEntries();
+        // Re-render based on whether showing today or search
+        if (currentView === 'today') {
+          renderCurrentDayEntries();
+        } else {
+          performSearch(currentSearch);
+        }
       }
     }
 
@@ -695,6 +703,9 @@
       return n;
     }
 
+    let currentView = 'today';
+    let currentSearch = null;
+
     function renderEntries(items) {
       resultsContainer.innerHTML = '';
       if (!items.length) {
@@ -712,6 +723,15 @@
 
         // Determine if this entry is selected for summation
         const isSelected = selectedForSum.has(entry.id);
+
+        // Highlight today's entries
+        const todayISO = getTodayISODate();
+        const entryDateISO = new Date(entry.year, entry.month - 1, entry.date).toISOString().slice(0,10);
+        const isToday = (entryDateISO === todayISO);
+        if (isToday) {
+          item.style.backgroundColor = 'var(--today-bg)';
+          item.style.border = `2px solid var(--today-border)`;
+        }
 
         item.innerHTML = `
           <div class="select-checkbox">
@@ -790,7 +810,6 @@
       updateTotalCashSum();
     }
 
-    // Render only today's entries for initial preview
     function renderCurrentDayEntries() {
       const allData = loadDeliveryData();
       const todayISO = getTodayISODate();
@@ -798,10 +817,135 @@
         const entryDateISO = new Date(entry.year, entry.month - 1, entry.date).toISOString().slice(0,10);
         return entryDateISO === todayISO;
       });
-      // Clear selection for sum for preview
+      currentView = 'today';
+      currentSearch = null;
       selectedForSum.clear();
       updateTotalCashSum();
       renderEntries(filtered);
+    }
+    function performSearch(searchParams) {
+      const allData = loadDeliveryData();
+      const {driverSearch, dateSearch, routeSearch} = searchParams;
+      const filtered = allData.filter(entry => {
+        let driverMatch = true,
+            dateMatch = true,
+            routeMatch = true;
+        if (driverSearch) {
+          driverMatch = entry.driver.toLowerCase().includes(driverSearch);
+        }
+        if (dateSearch) {
+          const entryDateISO = new Date(entry.year, entry.month-1, entry.date).toISOString().slice(0,10);
+          dateMatch = entryDateISO === dateSearch;
+        }
+        if (routeSearch) {
+          routeMatch = entry.route.toLowerCase().includes(routeSearch);
+        }
+        return driverMatch && dateMatch && routeMatch;
+      });
+      currentView = 'search';
+      currentSearch = searchParams;
+      selectedForSum.clear();
+      updateTotalCashSum();
+      renderEntries(filtered);
+    }
+
+    // Search form handler (searches all data)
+    searchForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const driverSearch = searchDriverInput.value.trim().toLowerCase();
+      const dateSearch = searchDateInput.value;
+      const routeSearch = searchRouteInput.value.trim().toLowerCase();
+
+      performSearch({driverSearch, dateSearch, routeSearch});
+    });
+
+    // Dark mode toggle function
+    function applyDarkMode(enabled) {
+      if (enabled) {
+        document.body.classList.add('dark');
+        darkModeIcon.textContent = 'light_mode';
+      } else {
+        document.body.classList.remove('dark');
+        darkModeIcon.textContent = 'dark_mode';
+      }
+    }
+    darkModeToggle.addEventListener('click', () => {
+      const isDark = document.body.classList.contains('dark');
+      const newMode = !isDark;
+      applyDarkMode(newMode);
+      localStorage.setItem(DARK_MODE_KEY, newMode ? '1' : '0');
+    });
+
+    // Load dark mode preference on page load
+    function loadDarkModePreference() {
+      const val = localStorage.getItem(DARK_MODE_KEY);
+      const isDark = val === '1';
+      applyDarkMode(isDark);
+    }
+
+    let currentView = 'today';
+    let currentSearch = null;
+
+    // Initial setup: load demo data and render today's entries
+    function loadDemoData() {
+      const map = loadDriverPlateMap();
+      if (Object.keys(map).length === 0) {
+        const demoMap = {
+          'Agus': 'B 1234 XYZ',
+          'Budi': 'D 5678 ABC',
+          'Citra': 'F 9012 DEF'
+        };
+        saveDriverPlateMap(demoMap);
+      }
+      const data = loadDeliveryData();
+      if (data.length === 0) {
+        const demoEntries = [
+          {
+            id: 'demo1',
+            day: 'Senin',
+            date: 14,
+            month: 8,
+            year: 2023,
+            driver: 'Agus',
+            plate: 'B 1234 XYZ',
+            route: 'Jakarta - Bandung',
+            division: ['Elektronik'],
+            divisionCount: 1,
+            cashDeposit: 2000000,
+            adminChecked: true
+          },
+          {
+            id: 'demo2',
+            day: 'Selasa',
+            date: 15,
+            month: 8,
+            year: 2023,
+            driver: 'Budi',
+            plate: 'D 5678 ABC',
+            route: 'Bandung - Surabaya',
+            division: ['Makanan', 'Minuman'],
+            divisionCount: 2,
+            cashDeposit: 3500000,
+            adminChecked: false
+          },
+          {
+            id: 'demo3',
+            day: 'Rabu',
+            date: 16,
+            month: 8,
+            year: 2023,
+            driver: 'Citra',
+            plate: 'F 9012 DEF',
+            route: 'Surabaya - Malang',
+            division: ['Pakaian', 'Aksesoris', 'Sepatu'],
+            divisionCount: 3,
+            cashDeposit: 1500000,
+            adminChecked: true
+          }
+        ];
+        saveDeliveryData(demoEntries);
+      }
+      renderCurrentDayEntries();
     }
 
     loadDarkModePreference();
@@ -812,5 +956,3 @@
 </body>
 </html>
 
-
-        
