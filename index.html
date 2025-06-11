@@ -1,172 +1,573 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>File & Video Downloader</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sistem Tracking Pengantaran Barang</title>
+<!-- Google Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 <style>
-  /* Reset and basic styles */
+  /* Reset and base */
   * {
     box-sizing: border-box;
   }
   body {
     margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    max-height: 600px;
-    padding: 20px;
-  }
-  .container {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 24px 32px;
-    width: 100%;
-    max-width: 360px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    font-family: 'Poppins', sans-serif;
+    background: #f9fafe;
+    color: #222;
+    line-height: 1.6;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    padding: 16px;
   }
   h1 {
-    margin: 0 0 16px 0;
-    font-size: 1.8rem;
     font-weight: 700;
-    text-align: center;
-    user-select: none;
+    margin-bottom: 24px;
+    font-size: 1.8rem;
+  }
+  /* Container */
+  .container {
+    max-width: 960px;
+    width: 100%;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 12px 24px rgb(0 0 0 / 0.05);
+    padding: 24px 32px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  /* Form styles */
+  form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+    gap: 20px 32px;
   }
   label {
-    font-size: 1rem;
-    margin-bottom: 8px;
-    user-select: none;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
   }
-  input[type="url"] {
-    padding: 12px 16px;
+  input[type="text"],
+  input[type="date"],
+  input[type="number"],
+  select {
+    width: 100%;
+    padding: 10px 12px;
     font-size: 1rem;
     border-radius: 8px;
-    border: none;
-    outline: none;
-    margin-bottom: 20px;
-    width: 100%;
-    box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
+    border: 1.5px solid #ddd;
+    transition: border-color 0.3s ease;
+    outline-offset: 2px;
   }
-  input[type="url"]::placeholder {
-    color: #ddd;
+  input[type="text"]:focus,
+  input[type="date"]:focus,
+  select:focus,
+  input[type="number"]:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 8px rgba(79,70,229,0.3);
   }
+  /* Checkbox container */
+  .checkbox-group {
+    align-self: center;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+  }
+  input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+  /* Button */
   button {
-    background: #fff;
-    color: #764ba2;
+    grid-column: 1/-1;
+    background: #4f46e5;
+    color: #fff;
     font-weight: 700;
     font-size: 1.1rem;
     padding: 14px;
+    border-radius: 12px;
     border: none;
-    border-radius: 10px;
     cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 8px 15px rgb(79 70 229 / 0.25);
   }
-  button:hover:not(:disabled) {
-    background: #f3e8ff;
-    color: #4a2975;
+  button:hover,
+  button:focus {
+    background-color: #3730a3;
   }
   button:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
+    background-color: #a5b4fc;
+    cursor: default;
+    box-shadow: none;
   }
-  .message {
-    margin-top: 18px;
-    font-size: 0.95rem;
-    min-height: 20px;
-    text-align: center;
-    user-select: none;
+  /* Search form */
+  .search-section {
+    border-top: 2px solid #f0f0f0;
+    padding-top: 20px;
   }
-  @media (max-width: 400px) {
-    .container {
-      padding: 20px 24px;
-      max-width: 100%;
+  .search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 24px;
+    justify-content: space-between;
+  }
+  .search-form > * {
+    flex: 1 1 280px;
+    min-width: 280px;
+  }
+  .search-form input,
+  .search-form select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #ddd;
+    font-size: 1rem;
+    outline-offset: 2px;
+    transition: border-color 0.3s ease;
+    width: 100%;
+  }
+  .search-form input:focus,
+  .search-form select:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 8px rgba(79,70,229,0.3);
+  }
+  .search-button {
+    flex: 0 0 140px;
+    background: #2563eb;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 10px 0;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 5px 12px rgb(37 99 235 / 0.3);
+    align-self: center;
+  }
+  .search-button:hover,
+  .search-button:focus {
+    background-color: #1e40af;
+  }
+  /* Results section */
+  .results-section {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 8px;
+  }
+  .result-item {
+    background: #fafafa;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgb(0 0 0 / 0.05);
+    padding: 16px 24px;
+    margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 24px;
+    align-items: center;
+  }
+  .result-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .result-item strong {
+    font-weight: 700;
+    color: #4f46e5;
+  }
+  .result-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: #047857;
+  }
+  .result-status .material-icons {
+    font-size: 20px;
+    color: #059669;
+  }
+  /* Scrollbar styling */
+  .results-section::-webkit-scrollbar {
+    width: 8px;
+  }
+  .results-section::-webkit-scrollbar-thumb {
+    background: #4f46e5;
+    border-radius: 12px;
+  }
+  /* Responsive */
+  @media (max-width: 600px) {
+    form, .search-form {
+      grid-template-columns: 1fr !important;
+    }
+    button, .search-button {
+      width: 100%;
     }
   }
 </style>
 </head>
 <body>
-  <div class="container" role="main">
-    <h1>File & Video Downloader</h1>
-    <label for="urlInput">Enter file or video URL:</label>
-    <input type="url" id="urlInput" placeholder="https://example.com/video.mp4" required autocomplete="off" />
-    <button id="downloadBtn" disabled>Download</button>
-    <div class="message" aria-live="polite" id="messageArea"></div>
-  </div>
+  <main class="container" role="main" aria-label="Sistem Tracking Pengantaran Barang">
+    <h1>Sistem Tracking Pengantaran Barang</h1>
+    
+    <section aria-labelledby="input-header">
+      <h2 id="input-header" style="font-size:1.25rem; margin-bottom:16px;">Input Data Pengantaran</h2>
+      <form id="delivery-form" aria-describedby="form-desc" novalidate>
+        <div>
+          <label for="date-delivery">Tanggal Pengantaran</label>
+          <input type="date" id="date-delivery" name="dateDelivery" required aria-required="true" aria-describedby="date-desc" />
+          <div id="date-desc" class="sr-only">Pilih tanggal pengantaran untuk menentukan hari, tanggal, bulan, dan tahun</div>
+        </div>
+        <div>
+          <label for="day-delivery">Hari Pengantaran</label>
+          <input type="text" id="day-delivery" name="dayDelivery" readonly aria-readonly="true" aria-describedby="day-desc" />
+          <div id="day-desc" class="sr-only">Hari otomatis disesuaikan dengan tanggal pengantaran</div>
+        </div>
+        <div>
+          <label for="driver-name">Nama Supir</label>
+          <input type="text" id="driver-name" name="driverName" required aria-required="true" autocomplete="off" />
+        </div>
+        <div>
+          <label for="plate-number">Nomor Plat Mobil</label>
+          <input type="text" id="plate-number" name="plateNumber" placeholder="Isi hanya sekali per supir" autocomplete="off" />
+        </div>
+        <div>
+          <label for="route">Rute</label>
+          <input type="text" id="route" name="route" required aria-required="true" />
+        </div>
+        <div>
+          <label for="division">Divisi Barang</label>
+          <input type="text" id="division" name="division" required aria-required="true" />
+        </div>
+        <div>
+          <label for="division-count">Jumlah Divisi</label>
+          <input type="number" min="1" id="division-count" name="divisionCount" required aria-required="true" />
+        </div>
+        <div>
+          <label for="cash-deposit">Uang Cash Yang Disetor Hari Ini (Rp)</label>
+          <input type="number" min="0" step="1000" id="cash-deposit" name="cashDeposit" required aria-required="true" />
+        </div>
+        <div class="checkbox-group" style="grid-column: 1 / -1;">
+          <input type="checkbox" id="admin-checked" name="adminChecked" />
+          <label for="admin-checked">Verifikasi oleh Admin (Note dicek)</label>
+        </div>
+        <button type="submit" id="submit-btn">Simpan Data Pengantaran</button>
+      </form>
+    </section>
+
+    <section class="search-section" aria-labelledby="search-header">
+      <h2 id="search-header" style="font-size:1.25rem; margin-bottom:16px;">Cari Data Pengantaran</h2>
+      <form id="search-form" aria-describedby="search-desc" novalidate class="search-form">
+        <input type="text" id="search-driver" placeholder="Cari berdasarkan Nama Supir" aria-label="Cari berdasarkan Nama Supir" autocomplete="off" />
+        <input type="date" id="search-date" aria-label="Cari berdasarkan Tanggal Pengantaran" />
+        <input type="text" id="search-route" placeholder="Cari berdasarkan Rute" aria-label="Cari berdasarkan Rute" autocomplete="off" />
+        <button type="submit" class="search-button" aria-label="Mulai pencarian">Cari</button>
+      </form>
+      <div class="results-section" id="results" aria-live="polite" aria-atomic="true" aria-relevant="additions"></div>
+    </section>
+  </main>
 <script>
-  const urlInput = document.getElementById('urlInput');
-  const downloadBtn = document.getElementById('downloadBtn');
-  const messageArea = document.getElementById('messageArea');
+  (() => {
+    // Storage keys
+    const DELIVERY_DATA_KEY = 'delivery_data';
+    const DRIVER_PLATE_MAP_KEY = 'driver_plate_map';
 
-  // Helper: validate URL
-  function isValidHttpUrl(string) {
-    try {
-      let url = new URL(string);
-      return url.protocol === "http:" || url.protocol === "https:";
-    } catch (_) {
-      return false;  
+    // Elements
+    const form = document.getElementById('delivery-form');
+    const dateInput = document.getElementById('date-delivery');
+    const dayInput = document.getElementById('day-delivery');
+    const driverInput = document.getElementById('driver-name');
+    const plateInput = document.getElementById('plate-number');
+    const routeInput = document.getElementById('route');
+    const divisionInput = document.getElementById('division');
+    const divisionCountInput = document.getElementById('division-count');
+    const cashDepositInput = document.getElementById('cash-deposit');
+    const adminCheckedInput = document.getElementById('admin-checked');
+    const submitBtn = document.getElementById('submit-btn');
+
+    const searchForm = document.getElementById('search-form');
+    const searchDriverInput = document.getElementById('search-driver');
+    const searchDateInput = document.getElementById('search-date');
+    const searchRouteInput = document.getElementById('search-route');
+    const resultsContainer = document.getElementById('results');
+
+    // Utility: day names in Indonesian
+    const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', "Jumat", 'Sabtu'];
+
+    // Load and save data helpers
+    function loadDeliveryData() {
+      try {
+        return JSON.parse(localStorage.getItem(DELIVERY_DATA_KEY)) || [];
+      } catch {
+        return [];
+      }
     }
-  }
+    function saveDeliveryData(data) {
+      localStorage.setItem(DELIVERY_DATA_KEY, JSON.stringify(data));
+    }
+    function loadDriverPlateMap() {
+      try {
+        return JSON.parse(localStorage.getItem(DRIVER_PLATE_MAP_KEY)) || {};
+      } catch {
+        return {};
+      }
+    }
+    function saveDriverPlateMap(map) {
+      localStorage.setItem(DRIVER_PLATE_MAP_KEY, JSON.stringify(map));
+    }
 
-  urlInput.addEventListener('input', () => {
-    const url = urlInput.value.trim();
-    if (isValidHttpUrl(url)) {
-      downloadBtn.disabled = false;
-      messageArea.textContent = '';
-    } else {
-      downloadBtn.disabled = true;
-      if (url.length > 0) {
-        messageArea.textContent = 'Please enter a valid URL starting with http:// or https://';
+    // Auto update day when date changes
+    dateInput.addEventListener('input', () => {
+      if (dateInput.value) {
+        const date = new Date(dateInput.value + 'T00:00:00'); // avoid timezone issues
+        dayInput.value = dayNames[date.getDay()];
       } else {
-        messageArea.textContent = '';
+        dayInput.value = '';
+      }
+    });
+
+    // Auto-fill plate number when driver name changes based on saved mapping
+    driverInput.addEventListener('change', () => {
+      const driver = driverInput.value.trim();
+      if (!driver) {
+        plateInput.value = '';
+        plateInput.disabled = false;
+        return;
+      }
+      const map = loadDriverPlateMap();
+      if (map[driver]) {
+        plateInput.value = map[driver];
+        plateInput.disabled = true;
+      } else {
+        plateInput.value = '';
+        plateInput.disabled = false;
+      }
+    });
+
+    // When plate changes manually, save mapping if driver is filled
+    plateInput.addEventListener('change', () => {
+      const driver = driverInput.value.trim();
+      if (driver && plateInput.value.trim()) {
+        const map = loadDriverPlateMap();
+        map[driver] = plateInput.value.trim();
+        saveDriverPlateMap(map);
+        plateInput.disabled = true;
+      }
+    });
+
+    // On submit, validate and save the entry
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      submitBtn.disabled = true;
+      // Basic validation
+      if (!dateInput.value) {
+        alert('Tanggal pengantaran harus diisi.');
+        submitBtn.disabled = false;
+        return;
+      }
+      if (!driverInput.value.trim()) {
+        alert('Nama supir harus diisi.');
+        submitBtn.disabled = false;
+        return;
+      }
+      if (!routeInput.value.trim()) {
+        alert('Rute harus diisi.');
+        submitBtn.disabled = false;
+        return;
+      }
+      if (!divisionInput.value.trim()) {
+        alert('Divisi barang harus diisi.');
+        submitBtn.disabled = false;
+        return;
+      }
+      if (!divisionCountInput.value || parseInt(divisionCountInput.value) < 1) {
+        alert('Jumlah divisi harus berupa angka positif.');
+        submitBtn.disabled = false;
+        return;
+      }
+      if (cashDepositInput.value === '' || Number(cashDepositInput.value) < 0) {
+        alert('Uang cash yang disetor harus nol atau lebih.');
+        submitBtn.disabled = false;
+        return;
+      }
+
+      // Save driver-plate mapping
+      const driver = driverInput.value.trim();
+      const plate = plateInput.value.trim();
+      if (driver && plate) {
+        const map = loadDriverPlateMap();
+        if (!map[driver]) { // Save only if not already present
+          map[driver] = plate;
+          saveDriverPlateMap(map);
+          plateInput.disabled = true;
+        }
+      }
+
+      // Compose new entry
+      const dateObj = new Date(dateInput.value + 'T00:00:00');
+      const year = dateObj.getFullYear();
+      const month = dateObj.getMonth() + 1;
+      const day = dateObj.getDate();
+      const dayName = dayNames[dateObj.getDay()];
+
+      const entry = {
+        id: Date.now().toString(),
+        day: dayName,
+        date: day,
+        month: month,
+        year: year,
+        driver,
+        plate,
+        route: routeInput.value.trim(),
+        division: divisionInput.value.trim(),
+        divisionCount: parseInt(divisionCountInput.value),
+        cashDeposit: Number(cashDepositInput.value),
+        adminChecked: adminCheckedInput.checked
+      };
+
+      // Save entry
+      const data = loadDeliveryData();
+      data.push(entry);
+      saveDeliveryData(data);
+      alert('Data pengantaran berhasil disimpan.');
+
+      // Reset form except plate field
+      form.reset();
+      dayInput.value = '';
+      plateInput.disabled = false;
+      submitBtn.disabled = false;
+      renderResults(data);
+    });
+
+    // Render search results
+    function renderResults(items) {
+      resultsContainer.innerHTML = '';
+      if (!items.length) {
+        resultsContainer.innerHTML = '<p style="text-align:center; color:#666;">Tidak ditemukan data pengantaran.</p>';
+        return;
+      }
+      for (const entry of items) {
+        const item = document.createElement('div');
+        item.className = 'result-item';
+        item.innerHTML = `
+          <div class="result-left" tabindex="0">
+            <strong>${entry.driver}</strong>
+            <div>Plat: ${entry.plate || '-'}</div>
+            <div>Rute: ${entry.route}</div>
+            <div>Divisi: ${entry.division} (Jumlah: ${entry.divisionCount})</div>
+            <div>Tanggal: ${entry.day}, ${('0'+entry.date).slice(-2)}/${('0'+entry.month).slice(-2)}/${entry.year}</div>
+            <div>Uang Cash: Rp ${entry.cashDeposit.toLocaleString('id-ID')}</div>
+          </div>
+          <div class="result-status" aria-label="Status verifikasi oleh admin">
+            ${entry.adminChecked
+              ? '<span class="material-icons" title="Sudah diverifikasi oleh admin">check_circle</span> Terkonfirmasi'
+              : '<span class="material-icons" title="Belum diverifikasi oleh admin">pending</span> Belum Dikonfirmasi'}
+          </div>
+        `;
+        resultsContainer.appendChild(item);
       }
     }
-  });
 
-  downloadBtn.addEventListener('click', () => {
-    const url = urlInput.value.trim();
-    if (!isValidHttpUrl(url)) {
-      messageArea.textContent = 'Invalid URL. Please enter a valid http or https URL.';
-      return;
-    }
-    downloadBtn.disabled = true;
-    messageArea.textContent = 'Preparing download...';
+    // Search form behavior
+    searchForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const allData = loadDeliveryData();
 
-    // Create a hidden anchor for download
-    // Extract file name from URL (if possible)
-    let fileName = "download";
-    try {
-      const urlObj = new URL(url);
-      const pathParts = urlObj.pathname.split('/');
-      const lastPart = pathParts[pathParts.length - 1];
-      if (lastPart) {
-        fileName = decodeURIComponent(lastPart.split('?')[0]) || fileName;
+      const driverSearch = searchDriverInput.value.trim().toLowerCase();
+      const dateSearch = searchDateInput.value;
+      const routeSearch = searchRouteInput.value.trim().toLowerCase();
+
+      const filtered = allData.filter(entry => {
+        let driverMatch = true,
+            dateMatch = true,
+            routeMatch = true;
+        if (driverSearch) {
+          driverMatch = entry.driver.toLowerCase().includes(driverSearch);
+        }
+        if (dateSearch) {
+          // Compare as ISO date string yyyy-mm-dd
+          const entryDateISO = new Date(entry.year, entry.month-1, entry.date).toISOString().slice(0,10);
+          dateMatch = entryDateISO === dateSearch;
+        }
+        if (routeSearch) {
+          routeMatch = entry.route.toLowerCase().includes(routeSearch);
+        }
+        return driverMatch && dateMatch && routeMatch;
+      });
+      renderResults(filtered);
+    });
+
+    // Initial setup: load data & demo data
+    function loadDemoData() {
+      const map = loadDriverPlateMap();
+      if (Object.keys(map).length === 0) {
+        const demoMap = {
+          'Agus': 'B 1234 XYZ',
+          'Budi': 'D 5678 ABC',
+          'Citra': 'F 9012 DEF'
+        };
+        saveDriverPlateMap(demoMap);
       }
-    } catch(e) {
-      // fallback to default "download"
+      const data = loadDeliveryData();
+      if (data.length === 0) {
+        const demoEntries = [
+          {
+            id: 'demo1',
+            day: 'Senin',
+            date: 14,
+            month: 8,
+            year: 2023,
+            driver: 'Agus',
+            plate: 'B 1234 XYZ',
+            route: 'Jakarta - Bandung',
+            division: 'Elektronik',
+            divisionCount: 3,
+            cashDeposit: 2000000,
+            adminChecked: true
+          },
+          {
+            id: 'demo2',
+            day: 'Selasa',
+            date: 15,
+            month: 8,
+            year: 2023,
+            driver: 'Budi',
+            plate: 'D 5678 ABC',
+            route: 'Bandung - Surabaya',
+            division: 'Makanan',
+            divisionCount: 5,
+            cashDeposit: 3500000,
+            adminChecked: false
+          },
+          {
+            id: 'demo3',
+            day: 'Rabu',
+            date: 16,
+            month: 8,
+            year: 2023,
+            driver: 'Citra',
+            plate: 'F 9012 DEF',
+            route: 'Surabaya - Malang',
+            division: 'Pakaian',
+            divisionCount: 2,
+            cashDeposit: 1500000,
+            adminChecked: true
+          }
+        ];
+        saveDeliveryData(demoEntries);
+        renderResults(demoEntries);
+      } else {
+        renderResults(data);
+      }
     }
 
-    // Create anchor element
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    a.target = '_blank';
-    a.rel = 'noopener';
+    loadDemoData();
 
-    // Append to DOM, click and remove immediately
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    messageArea.textContent = 'If the download did not start automatically, please check your link.';
-    downloadBtn.disabled = false;
-  });
+  })();
 </script>
 </body>
 </html>
