@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pengantaran Andaria</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+  <style>
+    /* ======== Dark Mode Styles ======== */
+    :root {
+      --bg: #121212;
+      --bg-soft: #1f1f1f;
+      --text: #f8f9fa;
+      --border: #444;
+      --primary: #198754;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+    }
+    h1 {
+      font-size: 1.6rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+    .form-label, .form-check-label, .table, .table th, .table td {
+      color: var(--text);
+    }
+    .form-control, .form-check-input {
+      background-color: var(--bg-soft);
+      color: var(--text);
+      border: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    .form-control::placeholder {
+      color: #aaa;
+    }
+    .form-check-input:checked {
+      background-color: var(--primary);
+      border-color: var(--primary);
+    }
+    .btn-success {
+      background-color: var(--primary);
+      border-color: var(--primary);
+    }
+    .btn-success:hover {
+      background-color: #157347;
+      border-color: #146c43;
+    }
+    .table-bordered {
+      border-color: var(--border);
+    }
+    .table-bordered th, .table-bordered td {
+      border-color: var(--border);
+    }
+    .table thead {
+      background-color: var(--bg-soft);
+    }
+    .table-responsive {
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body class="container py-3">
+  <h1>Pengantaran Andaria</h1>
+
+  <form id="form" class="needs-validation mb-4" novalidate>
+    <div class="mb-2">
+      <label class="form-label">Nama Supir</label>
+      <input type="text" id="driver" class="form-control" required placeholder="Contoh: Budi">
+    </div>
+    <div class="mb-2">
+      <label class="form-label">Plat Mobil</label>
+      <input type="text" id="plate" class="form-control" required placeholder="KB 1234 XY">
+    </div>
+    <div class="mb-2">
+      <label class="form-label">Rute</label>
+      <input type="text" id="route" class="form-control" required placeholder="Pontianak → Sambas">
+    </div>
+    <div class="mb-2">
+      <label class="form-label">Tanggal</label>
+      <input type="text" id="date" class="form-control" readonly>
+    </div>
+    <div class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" id="verified">
+      <label class="form-check-label">Sudah dicek Admin</label>
+    </div>
+    <button class="btn btn-success w-100" type="submit">+ Simpan Pengantaran</button>
+  </form>
+
+  <input type="text" id="search" class="form-control mb-3" placeholder="🔍 Cari nama supir atau tanggal...">
+
+  <div class="table-responsive mb-5">
+    <table class="table table-bordered table-sm">
+      <thead>
+        <tr>
+          <th>Supir</th>
+          <th>Plat</th>
+          <th>Rute</th>
+          <th>Tanggal</th>
+          <th>✔️</th>
+        </tr>
+      </thead>
+      <tbody id="data-body"></tbody>
+    </table>
+  </div>
+
+  <script>
+    // Konfigurasi Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCvyxjv9odhKVtL6u3Jjls70Jhui-yxGSo",
+      authDomain: "pengantaran-andaria.firebaseapp.com",
+      projectId: "pengantaran-andaria",
+      storageBucket: "pengantaran-andaria.firebasestorage.app",
+      messagingSenderId: "501077706231",
+      appId: "1:501077706231:web:51c1b456fe3c1d18e11af2",
+      measurementId: "G-0PSQ3HGGTW"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const deliveries = db.collection("deliveries");
+    const drivers = db.collection("drivers");
+
+    // Set tanggal
+    const dateField = document.getElementById("date");
+    const today = new Date().toISOString().split("T")[0];
+    dateField.value = today;
+
+    // Autofill plat
+    document.getElementById("driver").addEventListener("blur", async () => {
+      const name = document.getElementById("driver").value.trim();
+      if (!name) return;
+      const snap = await drivers.doc(name).get();
+      if (snap.exists) {
+        document.getElementById("plate").value = snap.data().plate;
+      }
+    });
+
+    // Submit
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const driver = document.getElementById("driver").value.trim();
+      const plate = document.getElementById("plate").value.trim();
+      const route = document.getElementById("route").value.trim();
+      const date  = document.getElementById("date").value;
+      const verified = document.getElementById("verified").checked;
+
+      if (!driver || !plate || !route) {
+        alert("Isi semua kolom!");
+        return;
+      }
+
+      await deliveries.add({ driver, plate, route, date, verified });
+      const docRef = drivers.doc(driver);
+      const snap = await docRef.get();
+      if (!snap.exists) {
+        await docRef.set({ plate });
+      }
+
+      document.getElementById("form").reset();
+      dateField.value = today;
+    });
+
+    // Render tabel
+    deliveries.orderBy("date", "desc").onSnapshot(snapshot => {
+      const tbody = document.getElementById("data-body");
+      tbody.innerHTML = "";
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${d.driver}</td>
+          <td>${d.plate}</td>
+          <td>${d.route}</td>
+          <td>${d.date}</td>
+          <td><input type="checkbox" ${d.verified ? "checked" : ""} disabled></td>
+        `;
+        tbody.appendChild(row);
+      });
+    });
+
+    // Pencarian
+    document.getElementById("search").addEventListener("input", () => {
+      const val = document.getElementById("search").value.toLowerCase();
+      document.querySelectorAll("#data-body tr").forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(val) ? "" : "none";
+      });
+    });
+  </script>
+</body>
+</html>
