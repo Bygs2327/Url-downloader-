@@ -1,5 +1,6 @@
 <!DOCTYPE html><html lang="id">
 <head>
+  <button class="btn btn-sm btn-outline-light float-end" onclick="firebase.auth().signOut()">Logout</button>
   <meta charset="UTF-8" />
   <title>Pengantaran Andaria</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,6 +10,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
   <style>
     :root {
@@ -225,6 +227,28 @@ h1 {
       measurementId: "G-0PSQ3HGGTW"
     };
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+// Tampilkan login modal jika belum login
+auth.onAuthStateChanged(user => {
+  if (!user) {
+    const loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
+    loginModal.show();
+  }
+});
+
+// Tombol login
+document.getElementById("loginButton").addEventListener("click", async () => {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    bootstrap.Modal.getInstance(document.getElementById("loginModal")).hide();
+  } catch (error) {
+    document.getElementById("loginError").innerText = "Login gagal: " + error.message;
+  }
+});
     const db = firebase.firestore();
     const deliveries = db.collection("deliveries");
     const drivers = db.collection("drivers");
@@ -329,5 +353,30 @@ h1 {
       deleteModal.hide();
     });
   </script>
+  <!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-white" style="background-color:#151515;">
+      <div class="modal-header border-0">
+        <h5 class="modal-title"><i class="bi bi-person-lock"></i> Login Admin</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label>Email</label>
+          <input type="email" id="loginEmail" class="form-control glow-control" placeholder="admin@example.com" required>
+        </div>
+        <div class="mb-3">
+          <label>Password</label>
+          <input type="password" id="loginPassword" class="form-control glow-control" placeholder="******" required>
+        </div>
+        <div id="loginError" class="text-danger small"></div>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-neon w-100" id="loginButton"><span>Login</span></button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
