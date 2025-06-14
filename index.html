@@ -103,11 +103,18 @@
   color: var(--text);
   background-color: rgba(26, 26, 26, 0.85) !important;
   border: 1px solid var(--border);
+  vertical-align: middle;
 }
 
 .table input[type="checkbox"] {
   transform: scale(1.2);
   accent-color: #28a745;
+}
+
+.delete-btn {
+  color: red;
+  font-size: 1.2rem;
+  cursor: pointer;
 }
 
   </style>
@@ -142,6 +149,7 @@
           <th>Rute</th>
           <th>Tanggal</th>
           <th>✔️</th>
+          <th>🗑️</th>
         </tr>
       </thead>
       <tbody id="data-body"></tbody>
@@ -163,7 +171,8 @@
   const deliveries = db.collection("deliveries");
   const drivers = db.collection("drivers");
 
-  document.getElementById("date").value = new Date().toISOString().split("T")[0];
+  const todayDate = new Date().toISOString().split("T")[0];
+  document.getElementById("date").value = todayDate;
 
   document.getElementById("driver").addEventListener("blur", async () => {
     const name = document.getElementById("driver").value.trim();
@@ -193,10 +202,10 @@
     if (!snap.exists) await docRef.set({ plate });
 
     document.getElementById("form").reset();
-    document.getElementById("date").value = new Date().toISOString().split("T")[0];
+    document.getElementById("date").value = todayDate;
   });
 
-  deliveries.orderBy("date", "desc").onSnapshot(snapshot => {
+  deliveries.where("date", "==", todayDate).orderBy("date", "desc").onSnapshot(snapshot => {
     const tbody = document.getElementById("data-body");
     tbody.innerHTML = "";
     snapshot.forEach(doc => {
@@ -208,17 +217,45 @@
         <td>${d.route}</td>
         <td>${d.date}</td>
         <td><input type="checkbox" ${d.verified ? "checked" : ""} data-id="${doc.id}" class="verify-checkbox"></td>
+        <td><span class="delete-btn" data-id="${doc.id}" title="Hapus">🗑️</span></td>
       `;
       tbody.appendChild(row);
     });
     ScrollReveal().reveal("#data-body tr", { interval: 100, distance: '20px', origin: 'bottom' });
   });
 
-  document.getElementById("search").addEventListener("input", () => {
+  document.getElementById("search").addEventListener("input", async () => {
     const val = document.getElementById("search").value.toLowerCase();
-    document.querySelectorAll("#data-body tr").forEach(row => {
-      row.style.display = row.innerText.toLowerCase().includes(val) ? "" : "none";
+    const tbody = document.getElementById("data-body");
+    tbody.innerHTML = "";
+    const snapshot = await deliveries.get();
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      if (
+        d.driver.toLowerCase().includes(val) ||
+        d.date.includes(val)
+      ) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${d.driver}</td>
+          <td>${d.plate}</td>
+          <td>${d.route}</td>
+          <td>${d.date}</td>
+          <td><input type="checkbox" ${d.verified ? "checked" : ""} data-id="${doc.id}" class="verify-checkbox"></td>
+          <td><span class="delete-btn" data-id="${doc.id}" title="Hapus">🗑️</span></td>
+        `;
+        tbody.appendChild(row);
+      }
     });
+  });
+
+  document.addEventListener("click", async (e) => {
+    if (e.target.classList.contains("delete-btn")) {
+      const id = e.target.getAttribute("data-id");
+      if (confirm("Yakin ingin menghapus pengantaran ini?")) {
+        await deliveries.doc(id).delete();
+      }
+    }
   });
 
   document.addEventListener("change", async (e) => {
