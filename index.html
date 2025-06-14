@@ -8,7 +8,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
   <style>
-    /* ======== Dark Mode Styles ======== */
     :root {
       --bg: #121212;
       --bg-soft: #1f1f1f;
@@ -27,7 +26,7 @@
       color: var(--text);
       font-weight: 600;
     }
-    .form-label, .form-check-label, .table, .table th, .table td {
+    .form-label, .form-check-label {
       color: var(--text);
     }
     .form-control, .form-check-input {
@@ -51,14 +50,14 @@
       background-color: #157347;
       border-color: #146c43;
     }
-    .table-bordered {
-      border-color: var(--border);
-    }
-    .table-bordered th, .table-bordered td {
-      border-color: var(--border);
+    .table th,
+    .table td {
+      color: var(--text);
+      background-color: var(--bg-soft) !important;
+      border-color: var(--border) !important;
     }
     .table thead {
-      background-color: var(--bg-soft);
+      background-color: var(--bg-soft) !important;
     }
     .table-responsive {
       font-size: 0.85rem;
@@ -110,7 +109,7 @@
   </div>
 
   <script>
-    // Konfigurasi Firebase
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyCvyxjv9odhKVtL6u3Jjls70Jhui-yxGSo",
       authDomain: "pengantaran-andaria.firebaseapp.com",
@@ -126,12 +125,12 @@
     const deliveries = db.collection("deliveries");
     const drivers = db.collection("drivers");
 
-    // Set tanggal
+    // Set tanggal otomatis
     const dateField = document.getElementById("date");
     const today = new Date().toISOString().split("T")[0];
     dateField.value = today;
 
-    // Autofill plat
+    // Auto isi plat
     document.getElementById("driver").addEventListener("blur", async () => {
       const name = document.getElementById("driver").value.trim();
       if (!name) return;
@@ -141,7 +140,7 @@
       }
     });
 
-    // Submit
+    // Simpan data
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const driver = document.getElementById("driver").value.trim();
@@ -166,7 +165,7 @@
       dateField.value = today;
     });
 
-    // Render tabel
+    // Tampilkan data
     deliveries.orderBy("date", "desc").onSnapshot(snapshot => {
       const tbody = document.getElementById("data-body");
       tbody.innerHTML = "";
