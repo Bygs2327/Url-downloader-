@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="id">
+<!DOCTYPE html><html lang="id">
 <head>
   <meta charset="UTF-8">
   <title>Pengantaran Andaria</title>
@@ -11,97 +10,99 @@
     :root {
       --bg: #121212;
       --bg-soft: #1f1f1f;
-      --text: #f8f9fa;
-      --border: #444;
+      --text: #f1f1f1;
+      --border: #333;
       --primary: #198754;
-    }
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-    }
-    h1 {
-      font-size: 1.6rem;
-      text-align: center;
-      margin-bottom: 1rem;
-      color: var(--text);
-      font-weight: 600;
-    }
-    .form-label, .form-check-label {
-      color: var(--text);
-    }
-    .form-control, .form-check-input {
-      background-color: var(--bg-soft);
-      color: var(--text);
-      border: 1px solid var(--border);
-      font-size: 0.9rem;
-    }
-    .form-control::placeholder {
-      color: #aaa;
-    }
-    .form-check-input:checked {
-      background-color: var(--primary);
-      border-color: var(--primary);
-    }
-    .btn-success {
-      background-color: var(--primary);
-      border-color: var(--primary);
-    }
-    .btn-success:hover {
-      background-color: #157347;
-      border-color: #146c43;
-    }
-    ..table th,
-.table td {
-  color: #f1f1f1;
-  background-color: #1e1e1e !important;
-  border: 1px solid #333 !important;
-  vertical-align: middle;
+    }body, html {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', sans-serif;
+  scroll-behavior: smooth;
+}
+
+.parallax {
+  background-image: url('https://images.unsplash.com/photo-1529921879218-dc2c89f6f10f');
+  min-height: 200px;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+}
+
+.parallax h1 {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 1rem;
+  border-radius: 10px;
+  font-size: 1.8rem;
+}
+
+.content {
+  padding: 2rem;
+}
+
+.form-control, .btn {
+  font-size: 0.9rem;
+}
+
+.form-control {
+  background-color: var(--bg-soft);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-success {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-success:hover {
+  background-color: #157347;
+  border-color: #146c43;
+}
+
+.table th, .table td {
+  color: var(--text);
+  background-color: var(--bg-soft) !important;
+  border: 1px solid var(--border);
 }
 
 .table input[type="checkbox"] {
   transform: scale(1.2);
-  accent-color: #28a745; /* hijau terang */
+  accent-color: #28a745;
 }
-    }
-    .table thead {
-      background-color: var(--bg-soft) !important;
-    }
-    .table-responsive {
-      font-size: 0.85rem;
-    }
+
   </style>
 </head>
-<body class="container py-3">
+<body><div class="parallax">
   <h1>Pengantaran Andaria</h1>
-
-  <form id="form" class="needs-validation mb-4" novalidate>
+</div><div class="content container">
+  <form id="form" class="mb-4">
     <div class="mb-2">
       <label class="form-label">Nama Supir</label>
-      <input type="text" id="driver" class="form-control" required placeholder="Contoh: Budi">
+      <input type="text" id="driver" class="form-control" required>
     </div>
     <div class="mb-2">
       <label class="form-label">Plat Mobil</label>
-      <input type="text" id="plate" class="form-control" required placeholder="KB 1234 XY">
+      <input type="text" id="plate" class="form-control" required>
     </div>
     <div class="mb-2">
       <label class="form-label">Rute</label>
-      <input type="text" id="route" class="form-control" required placeholder="Pontianak → Sambas">
+      <input type="text" id="route" class="form-control" required>
     </div>
     <div class="mb-2">
       <label class="form-label">Tanggal</label>
       <input type="text" id="date" class="form-control" readonly>
     </div>
-    <div class="form-check mb-3">
-      <input class="form-check-input" type="checkbox" id="verified">
-      <label class="form-check-label">Sudah dicek Admin</label>
-    </div>
     <button class="btn btn-success w-100" type="submit">+ Simpan Pengantaran</button>
-  </form>
-
-  <input type="text" id="search" class="form-control mb-3" placeholder="🔍 Cari nama supir atau tanggal...">
-
-  <div class="table-responsive mb-5">
-    <table class="table table-bordered table-sm">
+  </form>  <input type="text" id="search" class="form-control mb-3" placeholder="🔍 Cari nama supir atau tanggal...">  <div class="table-responsive">
+    <table class="table table-sm">
       <thead>
         <tr>
           <th>Supir</th>
@@ -114,89 +115,86 @@
       <tbody id="data-body"></tbody>
     </table>
   </div>
+</div><script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCvyxjv9odhKVtL6u3Jjls70Jhui-yxGSo",
+    authDomain: "pengantaran-andaria.firebaseapp.com",
+    projectId: "pengantaran-andaria",
+    storageBucket: "pengantaran-andaria.firebasestorage.app",
+    messagingSenderId: "501077706231",
+    appId: "1:501077706231:web:51c1b456fe3c1d18e11af2",
+    measurementId: "G-0PSQ3HGGTW"
+  };
 
-  <script>
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyCvyxjv9odhKVtL6u3Jjls70Jhui-yxGSo",
-      authDomain: "pengantaran-andaria.firebaseapp.com",
-      projectId: "pengantaran-andaria",
-      storageBucket: "pengantaran-andaria.firebasestorage.app",
-      messagingSenderId: "501077706231",
-      appId: "1:501077706231:web:51c1b456fe3c1d18e11af2",
-      measurementId: "G-0PSQ3HGGTW"
-    };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const deliveries = db.collection("deliveries");
+  const drivers = db.collection("drivers");
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const deliveries = db.collection("deliveries");
-    const drivers = db.collection("drivers");
+  document.getElementById("date").value = new Date().toISOString().split("T")[0];
 
-    // Set tanggal otomatis
-    const dateField = document.getElementById("date");
-    const today = new Date().toISOString().split("T")[0];
-    dateField.value = today;
+  document.getElementById("driver").addEventListener("blur", async () => {
+    const name = document.getElementById("driver").value.trim();
+    if (!name) return;
+    const snap = await drivers.doc(name).get();
+    if (snap.exists) {
+      document.getElementById("plate").value = snap.data().plate;
+    }
+  });
 
-    // Auto isi plat
-    document.getElementById("driver").addEventListener("blur", async () => {
-      const name = document.getElementById("driver").value.trim();
-      if (!name) return;
-      const snap = await drivers.doc(name).get();
-      if (snap.exists) {
-        document.getElementById("plate").value = snap.data().plate;
-      }
+  document.getElementById("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const driver = document.getElementById("driver").value.trim();
+    const plate = document.getElementById("plate").value.trim();
+    const route = document.getElementById("route").value.trim();
+    const date = document.getElementById("date").value;
+    const verified = false;
+
+    if (!driver || !plate || !route) {
+      alert("Isi semua kolom!");
+      return;
+    }
+
+    await deliveries.add({ driver, plate, route, date, verified });
+    const docRef = drivers.doc(driver);
+    const snap = await docRef.get();
+    if (!snap.exists) await docRef.set({ plate });
+
+    document.getElementById("form").reset();
+    document.getElementById("date").value = new Date().toISOString().split("T")[0];
+  });
+
+  deliveries.orderBy("date", "desc").onSnapshot(snapshot => {
+    const tbody = document.getElementById("data-body");
+    tbody.innerHTML = "";
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${d.driver}</td>
+        <td>${d.plate}</td>
+        <td>${d.route}</td>
+        <td>${d.date}</td>
+        <td><input type="checkbox" ${d.verified ? "checked" : ""} data-id="${doc.id}" class="verify-checkbox"></td>
+      `;
+      tbody.appendChild(row);
     });
+  });
 
-    // Simpan data
-    document.getElementById("form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const driver = document.getElementById("driver").value.trim();
-      const plate = document.getElementById("plate").value.trim();
-      const route = document.getElementById("route").value.trim();
-      const date  = document.getElementById("date").value;
-      const verified = document.getElementById("verified").checked;
-
-      if (!driver || !plate || !route) {
-        alert("Isi semua kolom!");
-        return;
-      }
-
-      await deliveries.add({ driver, plate, route, date, verified });
-      const docRef = drivers.doc(driver);
-      const snap = await docRef.get();
-      if (!snap.exists) {
-        await docRef.set({ plate });
-      }
-
-      document.getElementById("form").reset();
-      dateField.value = today;
+  document.getElementById("search").addEventListener("input", () => {
+    const val = document.getElementById("search").value.toLowerCase();
+    document.querySelectorAll("#data-body tr").forEach(row => {
+      row.style.display = row.innerText.toLowerCase().includes(val) ? "" : "none";
     });
+  });
 
-    // Tampilkan data
-    deliveries.orderBy("date", "desc").onSnapshot(snapshot => {
-      const tbody = document.getElementById("data-body");
-      tbody.innerHTML = "";
-      snapshot.forEach(doc => {
-        const d = doc.data();
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${d.driver}</td>
-          <td>${d.plate}</td>
-          <td>${d.route}</td>
-          <td>${d.date}</td>
-          <td><input type="checkbox" ${d.verified ? "checked" : ""} disabled></td>
-        `;
-        tbody.appendChild(row);
-      });
-    });
-
-    // Pencarian
-    document.getElementById("search").addEventListener("input", () => {
-      const val = document.getElementById("search").value.toLowerCase();
-      document.querySelectorAll("#data-body tr").forEach(row => {
-        row.style.display = row.innerText.toLowerCase().includes(val) ? "" : "none";
-      });
-    });
-  </script>
-</body>
+  document.addEventListener("change", async (e) => {
+    if (e.target.classList.contains("verify-checkbox")) {
+      const id = e.target.getAttribute("data-id");
+      const checked = e.target.checked;
+      await deliveries.doc(id).update({ verified: checked });
+    }
+  });
+</script></body>
+</html></body>
 </html>
