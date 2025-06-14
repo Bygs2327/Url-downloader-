@@ -50,11 +50,18 @@
       background-color: #157347;
       border-color: #146c43;
     }
-    .table th,
-    .table td {
-      color: var(--text);
-      background-color: var(--bg-soft) !important;
-      border-color: var(--border) !important;
+    ..table th,
+.table td {
+  color: #f1f1f1;
+  background-color: #1e1e1e !important;
+  border: 1px solid #333 !important;
+  vertical-align: middle;
+}
+
+.table input[type="checkbox"] {
+  transform: scale(1.2);
+  accent-color: #28a745; /* hijau terang */
+}
     }
     .table thead {
       background-color: var(--bg-soft) !important;
