@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pengantaran Andaria</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Bootstrap & Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <!-- Firebase & ScrollReveal -->
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+  <script src="https://unpkg.com/scrollreveal"></script>
+
+  <style>
+    :root{
+      --text:#f0f0f0;
+      --border:#444;
+      --primary:#00ff99;
+      --accent:#00ffff;
+      --neon-glow:0 0 5px #0ff,0 0 10px #0ff,0 0 15px #0ff,0 0 20px #0ff;
+    }
+
+    /* === Animated gradient background === */
+    body,html{
+      margin:0;
+      padding:0;
+      font-family:'Segoe UI',sans-serif;
+      scroll-behavior:smooth;
+      color:var(--text);
+      background:linear-gradient(-45deg,#8e2de2,#4a00e0,#ff6ec4);
+      background-size:400% 400%;
+      animation:gradientFlow 15s ease infinite;
+    }
+    @keyframes gradientFlow{
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
+    }
+    @keyframes fadeInUp{
+      from{opacity:0;transform:translateY(30px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+
+    /* === Parallax Header === */
+    .parallax{
+      background-image:url('https://images.unsplash.com/photo-1529921879218-dc2c89f6f10f?auto=format&fit=crop&w=1350&q=80');
+      min-height:250px;
+      background-attachment:fixed;
+      background-position:center;
+      background-repeat:no-repeat;
+      background-size:cover;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      color:white;
+    }
+    .parallax h1{
+      background:rgba(0,0,0,.6);
+      padding:1rem;
+      border-radius:10px;
+      font-size:1.8rem;
+      text-shadow:var(--neon-glow);
+      animation:glow 2s ease-in-out infinite alternate,fadeInUp 1s ease-out;
+    }
+    @keyframes glow{
+      from{text-shadow:0 0 5px #0ff}
+      to{text-shadow:0 0 20px #0ff,0 0 30px #0ff}
+    }
+
+    /* === Form & Button === */
+    .content{padding:2rem;}
+    .form-control{
+      background:#111;
+      color:var(--text);
+      border:1px solid var(--accent);
+      border-radius:8px;
+      box-shadow:inset 0 0 5px rgba(0,255,255,.2);
+      transition:all .3s;
+    }
+    .form-control:focus{
+      background:#000;
+      box-shadow:0 0 10px #0ff,0 0 20px #0ff;
+      border-color:#0ff;
+    }
+    .btn-neon{
+      background:linear-gradient(90deg,#00ff99,#00ffff);
+      color:#000;font-weight:bold;border:none;
+      border-radius:30px;
+      box-shadow:0 0 10px #0ff,0 0 20px #0ff;
+      transition:.3s;
+    }
+    .btn-neon:hover{
+      background:linear-gradient(90deg,#00ffff,#00ff99);
+      box-shadow:0 0 20px #0ff,0 0 40px #0ff;
+      transform:scale(1.05);
+    }
+
+    /* === Table === */
+    .table th,.table td{
+      color:var(--text);
+      background:rgba(26,26,26,.85)!important;
+      border:1px solid var(--border);
+      vertical-align:middle;
+    }
+    .table input[type=checkbox]{transform:scale(1.2);accent-color:#28a745}
+
+    /* Delete icon */
+    .delete-btn{
+      color:red;font-size:1.2rem;cursor:pointer;
+      transition:transform .3s,color .3s;
+    }
+    .delete-btn:hover{
+      transform:scale(1.3) rotate(-10deg);
+      color:#ff3333;text-shadow:0 0 10px red;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="parallax">
+    <h1 class="sr-header">Pengantaran Andaria</h1>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content container">
+    <!-- Form -->
+    <form id="form" class="mb-4">
+      <div class="mb-2">
+        <label class="form-label">Nama Supir</label>
+        <input type="text" id="driver" class="form-control" required>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Plat Mobil</label>
+        <input type="text" id="plate" class="form-control" required>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Rute</label>
+        <input type="text" id="route" class="form-control" required>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Tanggal</label>
+        <input type="text" id="date" class="form-control" readonly>
+      </div>
+      <button class="btn btn-neon w-100" type="submit">+ Simpan Pengantaran</button>
+    </form>
+
+    <!-- Search -->
+    <input type="text" id="search" class="form-control mb-3" placeholder="🔍 Cari nama supir atau tanggal...">
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>Supir</th><th>Plat</th><th>Rute</th><th>Tanggal</th><th>✔️</th><th>🗑️</th>
+          </tr>
+        </thead>
+        <tbody id="data-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+  /* ===== Firebase Init ===== */
+  const firebaseConfig={
+    apiKey:"AIzaSyCvyxjv9odhKVtL6u3Jjls70Jhui-yxGSo",
+    authDomain:"pengantaran-andaria.firebaseapp.com",
+    projectId:"pengantaran-andaria",
+    storageBucket:"pengantaran-andaria.firebasestorage.app",
+    messagingSenderId:"501077706231",
+    appId:"1:501077706231:web:51c1b456fe3c1d18e11af2",
+    measurementId:"G-0PSQ3HGGTW"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db=firebase.firestore();
+  const deliveries=db.collection('deliveries');
+  const drivers=db.collection('drivers');
+
+  /* ===== Globals ===== */
+  const todayDate=new Date().toISOString().split('T')[0];
+  document.getElementById('date').value=todayDate;
+
+  /* ===== Autofill Plate ===== */
+  document.getElementById('driver').addEventListener('blur',async()=>{
+    const name=document.getElementById('driver').value.trim();
+    if(!name) return;
+    const snap=await drivers.doc(name).get();
+    if(snap.exists) document.getElementById('plate').value=snap.data().plate;
+  });
+
+  /* ===== Submit Form ===== */
+  document.getElementById('form').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const driver=document.getElementById('driver').value.trim();
+    const plate=document.getElementById('plate').value.trim();
+    const route=document.getElementById('route').value.trim();
+    const date=document.getElementById('date').value;
+    if(!driver||!plate||!route){alert('Isi semua kolom!');return;}
+    await deliveries.add({driver,plate,route,date,verified:false});
+    const ref=drivers.doc(driver);const snap=await ref.get();
+    if(!snap.exists) await ref.set({plate});
+    e.target.reset();document.getElementById('date').value=todayDate;
+  });
+
+  /* ===== Realtime Daily Table ===== */
+  function renderRow(doc){
+    const d=doc.data();
+    return `<tr>
+      <td>${d.driver}</td>
+      <td>${d.plate}</td>
+      <td>${d.route}</td>
+      <td>${d.date}</td>
+      <td><input type="checkbox" ${d.verified?'checked':''} data-id="${doc.id}" class="verify-checkbox"></td>
+      <td><i class="fas fa-trash delete-btn" data-id="${doc.id}" title="Hapus"></i></td>
+    </tr>`;
+  }
+  deliveries.where('date','==',todayDate).orderBy('date','desc').onSnapshot(snap=>{
+    const tbody=document.getElementById('data-body');tbody.innerHTML='';
+    snap.forEach(doc=>tbody.insertAdjacentHTML('beforeend',renderRow(doc)));
+    ScrollReveal().reveal('#data-body tr',{interval:100,distance:'20px',origin:'bottom'});
+  });
+
+  /* ===== Search All Dates ===== */
+  document.getElementById('search').addEventListener('input',async()=>{
+    const val=document.getElementById('search').value.toLowerCase();
+    const tbody=document.getElementById('data-body');tbody.innerHTML='';
+    const snap=await deliveries.get();
+    snap.forEach(doc=>{
+      const d=doc.data();
+      if(d.driver.toLowerCase().includes(val)||d.date.includes(val))
+        tbody.insertAdjacentHTML('beforeend',renderRow(doc));
+    });
+  });
+
+  /* ===== Delete & Verify ===== */
+  document.addEventListener('click',async e=>{
+    if(e.target.classList.contains('delete-btn')){
+      const id=e.target.dataset.id;
+      if(confirm('Yakin ingin menghapus pengantaran ini?')) await deliveries.doc(id).delete();
+    }
+  });
+  document.addEventListener('change',async e=>{
+    if(e.target.classList.contains('verify-checkbox')){
+      const id=e.target.dataset.id;
+      await deliveries.doc(id).update({verified:e.target.checked});
+    }
+  });
+
+  /* ===== ScrollReveal ===== */
+  ScrollReveal().reveal('.sr-header',{delay:200,distance:'40px',origin:'top',duration:1000});
+  ScrollReveal().reveal('.content',{delay:300,duration:1200,distance:'40px',origin:'bottom'});
+</script>
+</body>
+</html>
