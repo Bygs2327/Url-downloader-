@@ -1,80 +1,202 @@
-<!DOCTYPE html><html lang="id">
+
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pengantaran Andaria</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
-  <script src="https://unpkg.com/scrollreveal"></script>
   <style>
-    :root{--text:#f0f0f0;--border:#444;--neon:#00ffff}
-    *{box-sizing:border-box}
-    body,html{margin:0;padding:0;font-family:"Segoe UI",sans-serif;color:var(--text);
-      background:linear-gradient(-45deg,#8e2de2,#4a00e0,#ff6ec4,#8e2de2);background-size:600% 600%;animation:bg 15s ease infinite}
-    @keyframes bg{0%{background-position:0 50%}50%{background-position:100% 50%}100%{background-position:0 50%}}
-    /* header */
-    .parallax{background:url('https://images.unsplash.com/photo-1529921879218-dc2c89f6f10f?auto=format&fit=crop&w=1350&q=80') center/cover fixed;height:240px;display:flex;align-items:center;justify-content:center}
-    .parallax h1{background:rgba(0,0,0,.55);padding:1rem 2rem;border-radius:10px;font-size:1.8rem;text-shadow:0 0 10px var(--neon)}
-    /* layout */
-    .content{max-width:650px;margin:auto;padding:2rem}
-    label{margin-top:.8rem}
-    input,select{width:100%;padding:10px;border-radius:8px;border:1px solid #888;background:rgba(0,0,0,.35);color:#fff}
-    input:focus{outline:none;border-color:var(--neon);box-shadow:0 0 8px var(--neon)}
-    .btn-neon{width:100%;padding:12px;margin-top:1rem;border:none;border-radius:25px;font-weight:bold;background:linear-gradient(90deg,#00ff99,#00ffff);color:#000;box-shadow:0 0 10px var(--neon)}
-    .btn-neon:hover{transform:scale(1.05)}
-    table{width:100%;margin-top:1rem;border-collapse:collapse;background:rgba(0,0,0,.3)}
-    th,td{padding:8px;border-bottom:1px solid var(--border)}
-    th{background:rgba(0,0,0,.55)}
-    .delete-btn{color:#ff5555;cursor:pointer}
-    /* modal */
-    #deleteModal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:1000}
-    .modal-box{background:#1e1e2f;padding:1.5rem;border-radius:12px;width:90%;max-width:320px;text-align:center}
-    .modal-btn{margin:.2rem .3rem;padding:.6rem 1.2rem;border:none;border-radius:6px;font-weight:bold;cursor:pointer}
-    .modal-yes{background:#ff0066;color:#fff}.modal-no{background:#666;color:#fff}
-    /* toast */
-    #toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);min-width:240px;max-width:90%;padding:12px 18px;border-radius:8px;font-weight:bold;text-align:center;display:none;z-index:1100}
-    #toast.success{background:linear-gradient(90deg,#00ff99,#00ffff);color:#000}
-    #toast.error{background:#ff4d4d;color:#fff}
-    #toast span{margin-left:12px;cursor:pointer;font-weight:900}
+    :root {
+      --bg: #121212;
+      --bg-soft: #1f1f1f;
+      --text: #f1f1f1;
+      --border: #333;
+      --primary: #198754;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .form-label {
+      color: var(--text);
+    }
+
+    .form-control {
+      background-color: var(--bg-soft);
+      color: var(--text);
+      border: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+
+    .form-control::placeholder {
+      color: #aaa;
+    }
+
+    .btn-success {
+      background-color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .btn-success:hover {
+      background-color: #157347;
+      border-color: #146c43;
+    }
+
+    .table th,
+    .table td {
+      color: var(--text);
+      background-color: var(--bg-soft) !important;
+      border: 1px solid var(--border) !important;
+      vertical-align: middle;
+    }
+
+    .table-responsive {
+      font-size: 0.85rem;
+    }
+
+    .table input[type="checkbox"] {
+      transform: scale(1.2);
+      accent-color: #28a745;
+    }
   </style>
 </head>
-<body>
-  <div class="parallax"><h1>Pengantaran Andaria</h1></div>
-  <div id="toast">Pesan<span id="toastClose">×</span></div>
-  <div class="content">
-    <form id="form">
-      <label>Nama Supir</label><input id="driver" placeholder="Contoh: Budi">
-      <label>Plat Mobil</label><input id="plate" placeholder="KB 1234 XY">
-      <label>Rute</label><input id="route" placeholder="Pontianak → Sambas">
-      <label>Tanggal</label><input id="date" type="date">
-      <button class="btn-neon" type="submit">+ Simpan Pengantaran</button>
-    </form>
-    <input id="search" class="mt-3" placeholder="🔍 Cari nama supir / tanggal...">
-    <table><thead><tr><th>Supir</th><th>Plat</th><th>Rute</th><th>Tanggal</th><th>✔</th><th>🗑</th></tr></thead><tbody id="tbody"></tbody></table>
+<body class="container py-3">
+  <h1>Pengantaran Andaria</h1>
+
+  <form id="form" class="needs-validation mb-4" novalidate>
+    <div class="mb-2">
+      <label class="form-label">Nama Supir</label>
+      <input type="text" id="driver" class="form-control" required placeholder="Contoh: Budi" />
+    </div>
+    <div class="mb-2">
+      <label class="form-label">Plat Mobil</label>
+      <input type="text" id="plate" class="form-control" required placeholder="KB 1234 XY" />
+    </div>
+    <div class="mb-2">
+      <label class="form-label">Rute</label>
+      <input type="text" id="route" class="form-control" required placeholder="Pontianak → Sambas" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Tanggal</label>
+      <input type="text" id="date" class="form-control" readonly />
+    </div>
+    <button class="btn btn-success w-100" type="submit">+ Simpan Pengantaran</button>
+  </form>
+
+  <input type="text" id="search" class="form-control mb-3" placeholder="🔍 Cari nama supir atau tanggal..." />
+
+  <div class="table-responsive mb-5">
+    <table class="table table-bordered table-sm">
+      <thead>
+        <tr>
+          <th>Supir</th>
+          <th>Plat</th>
+          <th>Rute</th>
+          <th>Tanggal</th>
+          <th>✔️</th>
+        </tr>
+      </thead>
+      <tbody id="data-body"></tbody>
+    </table>
   </div>
-  <div id="deleteModal"><div class="modal-box"><p>Yakin hapus data?</p><button class="modal-btn modal-yes" id="yesDel">Ya</button><button class="modal-btn modal-no" id="noDel">Batal</button></div></div>
-<script>
-/* === Firebase === */
-firebase.initializeApp({apiKey:"AIzaSyCvyxjv9odhKVtL6u3Jjls70Jhui-yxGSo",authDomain:"pengantaran-andaria.firebaseapp.com",projectId:"pengantaran-andaria"});
-const db=firebase.firestore();const deliveries=db.collection("pengantaran");const drivers=db.collection("drivers");
-/* === Elemen === */
-const driver=document.getElementById("driver"),plate=document.getElementById("plate"),route=document.getElementById("route"),date=document.getElementById("date"),tbody=document.getElementById("tbody"),toast=document.getElementById("toast");
-const today=new Date().toISOString().split("T")[0];date.value=today;
-/* === Toast === */
-function showToast(msg,ok=true){toast.className=ok?"success":"error";toast.firstChild.textContent=msg;toast.style.display="block";}
-toastClose.onclick=()=>toast.style.display="none";
-/* === Auto-fill plat === */
- driver.addEventListener("blur",async()=>{const n=driver.value.trim().toLowerCase();if(!n)return;const s=await drivers.doc(n).get();if(s.exists)plate.value=s.data().plat;});
-/* === Simpan === */
-form.addEventListener("submit",async e=>{e.preventDefault();const nama=driver.value.trim(),plat=plate.value.trim(),r=route.value.trim(),tgl=date.value;if(!nama||!plat||!r||!tgl){showToast("Lengkapi data!",false);return}
- try{await deliveries.add({nama,plat,rute:r,tanggal:tgl,dicek:false,dibuat:firebase.firestore.FieldValue.serverTimestamp()});await drivers.doc(nama.toLowerCase()).set({plat},{merge:true});form.reset();date.value=today;showToast("Data tersimpan!");}catch(err){console.error(err);showToast("Gagal simpan",false);} });
-/* === Load harian === */
-function renderRow(id,d){return `<tr><td>${d.nama}</td><td>${d.plat}</td><td>${d.rute}</td><td>${d.tanggal}</td><td style=text-align:center><input type=checkbox ${d.dicek?'checked':''} data-id=${id} class=chk></td><td style=text-align:center><i class='fas fa-trash delete-btn' data-id=${id}></i></td></tr>`}
-function loadToday(){deliveries.where("tanggal","==",today).onSnapshot(s=>{tbody.innerHTML="";let arr=[];s.forEach(doc=>arr.push({id:doc.id,...doc.data()}));arr.sort((a,b)=>(b.dibuat?.seconds||0)-(a.dibuat?.seconds||0));arr.forEach(o=>tbody.insertAdjacentHTML("beforeend",renderRow(o.id,o)));});}
-loadToday();
-/* === Search global === */
-search.addEventListener("input",async e=>{const q=e.target.value.toLowerCase();tbody.innerHTML="";(await deliveries.get()).forEach(doc=>{const d=doc.data();if(d.nama.toLowerCase().includes(q)||d.tanggal.includes(q))tbody.insertAdjacentHTML("beforeend",renderRow(doc.id,d));});});
-/* === Checkbox & Delete === */
-let delId=null;
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCvyxjv9odhKVtL6u3Jjls70Jhui-yxGSo",
+      authDomain: "pengantaran-andaria.firebaseapp.com",
+      projectId: "pengantaran-andaria",
+      storageBucket: "pengantaran-andaria.firebasestorage.app",
+      messagingSenderId: "501077706231",
+      appId: "1:501077706231:web:51c1b456fe3c1d18e11af2",
+      measurementId: "G-0PSQ3HGGTW"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const deliveries = db.collection("deliveries");
+    const drivers = db.collection("drivers");
+
+    const dateField = document.getElementById("date");
+    const today = new Date().toISOString().split("T")[0];
+    dateField.value = today;
+
+    document.getElementById("driver").addEventListener("blur", async () => {
+      const name = document.getElementById("driver").value.trim();
+      if (!name) return;
+      const snap = await drivers.doc(name).get();
+      if (snap.exists) {
+        document.getElementById("plate").value = snap.data().plate;
+      }
+    });
+
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const driver = document.getElementById("driver").value.trim();
+      const plate = document.getElementById("plate").value.trim();
+      const route = document.getElementById("route").value.trim();
+      const date  = document.getElementById("date").value;
+      const verified = false; // default tidak dicek admin
+
+      if (!driver || !plate || !route) {
+        alert("Isi semua kolom!");
+        return;
+      }
+
+      await deliveries.add({ driver, plate, route, date, verified });
+
+      const docRef = drivers.doc(driver);
+      const snap = await docRef.get();
+      if (!snap.exists) {
+        await docRef.set({ plate });
+      }
+
+      document.getElementById("form").reset();
+      dateField.value = today;
+    });
+
+    deliveries.orderBy("date", "desc").onSnapshot(snapshot => {
+      const tbody = document.getElementById("data-body");
+      tbody.innerHTML = "";
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${d.driver}</td>
+          <td>${d.plate}</td>
+          <td>${d.route}</td>
+          <td>${d.date}</td>
+          <td><input type="checkbox" ${d.verified ? "checked" : ""} data-id="${doc.id}" class="verify-checkbox"></td>
+        `;
+        tbody.appendChild(row);
+      });
+    });
+
+    document.getElementById("search").addEventListener("input", () => {
+      const val = document.getElementById("search").value.toLowerCase();
+      document.querySelectorAll("#data-body tr").forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(val) ? "" : "none";
+      });
+    });
+
+    // Ubah status verifikasi langsung dari checkbox di tabel
+    document.addEventListener("change", async (e) => {
+      if (e.target.classList.contains("verify-checkbox")) {
+        const id = e.target.getAttribute("data-id");
+        const checked = e.target.checked;
+        await deliveries.doc(id).update({ verified: checked });
+      }
+    });
+  </script>
+</body>
+</html>
