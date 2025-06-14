@@ -1,198 +1,128 @@
-<!DOCTYPE html><html lang="id">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <title>Pengantaran Andaria</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
-  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
   <style>
     :root {
-      --bg-start: #1a0035;
-      --bg-mid: #004b55;
-      --bg-end: #00377a;
+      --bg: #121212;
+      --bg-soft: #1f1f1f;
       --text: #f1f1f1;
-      --border: rgba(255, 255, 255, 0.15);
-      --primary: #00e77f;
-      --purple: #b366ff; /* gudang */
-      --yellow: #ffd860; /* bos */
-    }/* =========  Base ========= */
-body {
-  min-height: 100vh;
+      --border: #333;
+      --primary: #198754;
+      --glow: 0 0 10px rgba(0, 255, 200, 0.6);
+      --gradient: linear-gradient(270deg, #00f0ff, #00ff88, #a100ff);
+    }body {
+  background: var(--bg);
   color: var(--text);
-  background: linear-gradient(135deg, var(--bg-start), var(--bg-mid), var(--bg-end));
+  background: linear-gradient(120deg, #001f3f, #0f2027);
+  animation: gradientBG 15s ease infinite;
   background-size: 400% 400%;
-  animation: gradientShift 20s ease-in-out infinite;
-  font-family: "Inter", system-ui, sans-serif;
 }
 
-@keyframes gradientShift {
+@keyframes gradientBG {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
 h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
+  font-size: 1.6rem;
   text-align: center;
-  margin-bottom: 1.5rem;
-  text-shadow: 0 0 6px rgba(0, 255, 170, 0.6);
-}
-
-/* =========  Form & Controls  ========= */
-.form-label { color: var(--text); }
-
-.glow-control {
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-size: 0.9rem;
-  transition: box-shadow 0.3s;
-}
-.glow-control::placeholder { color: rgba(255, 255, 255, 0.5); }
-.glow-control:focus {
-  outline: none;
-  box-shadow: 0 0 8px var(--primary), 0 0 18px var(--primary);
-  border-color: var(--primary);
-  background-color: rgba(255, 255, 255, 0.07);
-}
-
-.btn-neon {
-  position: relative;
-  overflow: hidden;
-  z-index: 1;
-  border: none;
-  color: var(--text);
-  background-color: transparent;
+  margin-bottom: 1rem;
   font-weight: 600;
 }
-.btn-neon::before {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(45deg, #00e77f, #00c2ff, #6c5ce7, #ff00c8);
-  background-size: 400%;
-  filter: blur(20px);
-  animation: neonRotate 6s linear infinite;
-  z-index: -1;
-}
-.btn-neon:hover::before { filter: blur(30px); }
-@keyframes neonRotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-.btn-neon span {
-  position: relative;
-  z-index: 2;
+
+.form-label {
+  color: var(--text);
 }
 
-/* =========  Table ========= */
+.form-control {
+  background-color: var(--bg-soft);
+  color: #00ffcc;
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  box-shadow: var(--glow);
+  transition: 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #00ffcc;
+  box-shadow: 0 0 8px #00ffcc;
+}
+
+.form-control::placeholder {
+  color: #aaa;
+}
+
+.btn-success {
+  background-image: var(--gradient);
+  border: none;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 0 12px rgba(0, 255, 200, 0.6);
+}
+
+.btn-success:hover {
+  filter: brightness(1.2);
+  box-shadow: 0 0 15px rgba(0, 255, 200, 0.9);
+}
+
 .table th,
 .table td {
-  border-color: var(--border) !important;
+  color: var(--text);
+  background-color: var(--bg-soft) !important;
+  border: 1px solid var(--border) !important;
   vertical-align: middle;
 }
-.table thead th {
-  background-color: rgba(255, 255, 255, 0.08);
-}
-.table tbody tr {
-  backdrop-filter: blur(4px);
+
+.table-responsive {
+  font-size: 0.85rem;
 }
 
-/* Checkbox styling using accent-color for modern browsers */
-.check-warehouse { accent-color: var(--purple); transform: scale(1.2); }
-.check-boss { accent-color: var(--yellow); transform: scale(1.2); }
-
-/* Delete button */
-.delete-btn {
-  color: #ff6b6b;
-  cursor: pointer;
-  transition: color 0.2s;
+.table input[type="checkbox"] {
+  transform: scale(1.3);
+  accent-color: #28a745;
 }
-.delete-btn:hover { color: #ff1e1e; }
-
-/* =========  Modal custom ========= */
-.modal-content {
-  background-color: #151515;
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-}
-.modal-header { border-bottom: 1px solid var(--border); }
-.modal-footer { border-top: 1px solid var(--border); }
 
   </style>
 </head>
-<body class="container py-4">
-  <h1>Pengantaran Andaria</h1>  <!-- =========  Form ========= -->  <form id="form" class="needs-validation mb-4" novalidate>
-    <div class="row g-2">
-      <div class="col-md-4">
-        <label class="form-label">Nama Supir</label>
-        <input type="text" id="driver" class="form-control glow-control" required placeholder="Contoh: Budi" />
-      </div>
-      <div class="col-md-3">
-        <label class="form-label">Plat Mobil</label>
-        <input type="text" id="plate" class="form-control glow-control" required placeholder="KB 1234 XY" />
-      </div>
-      <div class="col-md-3">
-        <label class="form-label">Rute</label>
-        <input type="text" id="route" class="form-control glow-control" required placeholder="Pontianak → Sambas" />
-      </div>
-      <div class="col-md-2">
-        <label class="form-label">Tanggal</label>
-        <input type="text" id="date" class="form-control glow-control" readonly />
-      </div>
+<body class="container py-3">
+  <h1>Pengantaran Andaria</h1>  <form id="form" class="needs-validation mb-4" novalidate>
+    <div class="mb-2">
+      <label class="form-label">Nama Supir</label>
+      <input type="text" id="driver" class="form-control" required placeholder="Contoh: Budi" />
     </div>
-    <button class="btn btn-neon w-100 mt-3" type="submit"><span>+ Simpan Pengantaran</span></button>
-  </form>  <input type="text" id="search" class="form-control glow-control mb-3" placeholder="🔍 Cari nama supir, rute, atau tanggal..." />  <!-- =========  Table ========= -->  <div class="table-responsive mb-5">
-    <table class="table table-dark table-bordered table-sm align-middle text-center">
+    <div class="mb-2">
+      <label class="form-label">Plat Mobil</label>
+      <input type="text" id="plate" class="form-control" required placeholder="KB 1234 XY" />
+    </div>
+    <div class="mb-2">
+      <label class="form-label">Rute</label>
+      <input type="text" id="route" class="form-control" required placeholder="Pontianak → Sambas" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Tanggal</label>
+      <input type="text" id="date" class="form-control" readonly />
+    </div>
+    <button class="btn btn-success w-100" type="submit">+ Simpan Pengantaran</button>
+  </form>  <input type="text" id="search" class="form-control mb-3" placeholder="🔍 Cari nama supir atau tanggal..." />  <div class="table-responsive mb-5">
+    <table class="table table-bordered table-sm">
       <thead>
         <tr>
           <th>Supir</th>
           <th>Plat</th>
           <th>Rute</th>
           <th>Tanggal</th>
-          <th><i class="bi bi-box-fill text-purple"></i> Gudang</th>
-          <th><i class="bi bi-star-fill text-warning"></i> Bos</th>
-          <th><i class="bi bi-trash"></i></th>
+          <th>✔️</th>
         </tr>
       </thead>
       <tbody id="data-body"></tbody>
     </table>
-  </div>  <!-- =========  Modals ========= -->  <!-- Delete Confirmation Modal -->  <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title text-danger"><i class="bi bi-trash"></i> Hapus Pengantaran</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          Yakin ingin menghapus data pengantaran ini?
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <button type="button" class="btn btn-danger" id="confirmDelete">Hapus</button>
-        </div>
-      </div>
-    </div>
-  </div>  <!-- Status Modal -->  <div class="modal fade" id="statusModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-body text-center" id="statusMessage"></div>
-        <div class="modal-footer justify-content-center pb-4">
-          <button type="button" class="btn btn-neon px-4" data-bs-dismiss="modal"><span>OK</span></button>
-        </div>
-      </div>
-    </div>
-  </div>  <!-- =========  Scripts ========= -->  <!-- Bootstrap Bundle with Popper -->  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>  <script>
-    /* ----------  Firebase Init  ---------- */
+  </div>  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCvyxjv9odhKVtL6u3Jjls70Jhui-yxGSo",
       authDomain: "pengantaran-andaria.firebaseapp.com",
@@ -202,21 +132,12 @@ h1 {
       appId: "1:501077706231:web:51c1b456fe3c1d18e11af2",
       measurementId: "G-0PSQ3HGGTW"
     };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const deliveries = db.collection("deliveries");
     const drivers = db.collection("drivers");
 
-    /* ----------  Helpers  ---------- */
-    const statusModal = new bootstrap.Modal(document.getElementById("statusModal"));
-    const showStatus = (msg, isError = false) => {
-      const el = document.getElementById("statusMessage");
-      el.innerHTML = msg;
-      el.className = isError ? "text-danger fs-5" : "text-success fs-5";
-      statusModal.show();
-    };
-
-    /* ----------  Init Form ------------ */
     const dateField = document.getElementById("date");
     const today = new Date().toISOString().split("T")[0];
     dateField.value = today;
@@ -225,7 +146,9 @@ h1 {
       const name = document.getElementById("driver").value.trim();
       if (!name) return;
       const snap = await drivers.doc(name).get();
-      if (snap.exists) document.getElementById("plate").value = snap.data().plate;
+      if (snap.exists) {
+        document.getElementById("plate").value = snap.data().plate;
+      }
     });
 
     document.getElementById("form").addEventListener("submit", async (e) => {
@@ -234,28 +157,27 @@ h1 {
       const plate = document.getElementById("plate").value.trim();
       const route = document.getElementById("route").value.trim();
       const date  = document.getElementById("date").value;
+      const verified = false; // default tidak dicek admin
 
       if (!driver || !plate || !route) {
-        showStatus("Isi semua kolom!", true);
+        alert("Isi semua kolom!");
         return;
       }
 
-      try {
-        await deliveries.add({ driver, plate, route, date, warehouseChecked: false, bossChecked: false });
-        const docRef = drivers.doc(driver);
-        const snap = await docRef.get();
-        if (!snap.exists) await docRef.set({ plate });
-        document.getElementById("form").reset();
-        dateField.value = today;
-        showStatus("Pengantaran berhasil ditambahkan!");
-      } catch(err) {
-        showStatus("Gagal menambahkan pengantaran!", true);
+      await deliveries.add({ driver, plate, route, date, verified });
+
+      const docRef = drivers.doc(driver);
+      const snap = await docRef.get();
+      if (!snap.exists) {
+        await docRef.set({ plate });
       }
+
+      document.getElementById("form").reset();
+      dateField.value = today;
     });
 
-    /* ----------  Render Table ------------ */
-    const tbody = document.getElementById("data-body");
     deliveries.orderBy("date", "desc").onSnapshot(snapshot => {
+      const tbody = document.getElementById("data-body");
       tbody.innerHTML = "";
       snapshot.forEach(doc => {
         const d = doc.data();
@@ -265,52 +187,26 @@ h1 {
           <td>${d.plate}</td>
           <td>${d.route}</td>
           <td>${d.date}</td>
-          <td><input type="checkbox" class="check-warehouse" data-id="${doc.id}" data-role="warehouse" ${d.warehouseChecked ? "checked" : ""}></td>
-          <td><input type="checkbox" class="check-boss" data-id="${doc.id}" data-role="boss" ${d.bossChecked ? "checked" : ""}></td>
-          <td><i class="bi bi-trash delete-btn" data-id="${doc.id}"></i></td>
+          <td><input type="checkbox" ${d.verified ? "checked" : ""} data-id="${doc.id}" class="verify-checkbox"></td>
         `;
         tbody.appendChild(row);
       });
     });
 
-    /* ----------  Search Filter ------------ */
     document.getElementById("search").addEventListener("input", () => {
       const val = document.getElementById("search").value.toLowerCase();
-      tbody.querySelectorAll("tr").forEach(row => {
+      document.querySelectorAll("#data-body tr").forEach(row => {
         row.style.display = row.innerText.toLowerCase().includes(val) ? "" : "none";
       });
     });
 
-    /* ----------  Checkbox Change ------------ */
+    // Ubah status verifikasi langsung dari checkbox di tabel
     document.addEventListener("change", async (e) => {
-      if (e.target.matches(".check-warehouse, .check-boss")) {
-        const id = e.target.dataset.id;
-        const role = e.target.dataset.role;
+      if (e.target.classList.contains("verify-checkbox")) {
+        const id = e.target.getAttribute("data-id");
         const checked = e.target.checked;
-        const field = role === "warehouse" ? "warehouseChecked" : "bossChecked";
-        await deliveries.doc(id).update({ [field]: checked });
+        await deliveries.doc(id).update({ verified: checked });
       }
-    });
-
-    /* ----------  Delete Handling ------------ */
-    let deleteTargetId = null;
-    const deleteModal = new bootstrap.Modal(document.getElementById("deleteModal"));
-    document.addEventListener("click", (e) => {
-      if (e.target.classList.contains("delete-btn")) {
-        deleteTargetId = e.target.dataset.id;
-        deleteModal.show();
-      }
-    });
-    document.getElementById("confirmDelete").addEventListener("click", async () => {
-      if (!deleteTargetId) return;
-      try {
-        await deliveries.doc(deleteTargetId).delete();
-        showStatus("Data pengantaran berhasil dihapus!");
-      } catch(err) {
-        showStatus("Gagal menghapus data!", true);
-      }
-      deleteTargetId = null;
-      deleteModal.hide();
     });
   </script></body>
 </html>
